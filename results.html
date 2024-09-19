@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription Results</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap">
+    <!-- Custom CSS for Animations -->
+    <style>
+        /* Background Animation */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(-45deg, #8e2de2, #4a00e0, #ff416c, #ff4b2b);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            color: #fff;
+            padding: 20px;
+        }
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Card Fade-in Animation */
+        .card {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.85); /* Make background slightly transparent */
+            color: #333; /* Dark text for readability */
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Card Header Styling */
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.1); /* Slightly darken the header */
+            border-bottom: none;
+        }
+
+        /* Pre-formatting for Transcription */
+        pre {
+            font-family: 'Courier New', Courier, monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Wrap long lines */
+            color: #333; /* Dark text */
+        }
+
+        /* Hover effect on Cards */
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+
+        /* Add a smooth scroll for internal navigation */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Visualization container styling */
+        .visualization-container {
+            margin-top: 20px;
+        }
+        .visualization-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Transcription Results</h1>
+
+        <!-- Transcription Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Transcription</h2>
+            </div>
+            <div class="card-body">
+                <pre>{{ transcription }}</pre>
+            </div>
+        </div>
+
+        <!-- Metadata Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Metadata</h2>
+            </div>
+            <div class="card-body">
+                {% if metadata %}
+                    {% for key, value in metadata.items() %}
+                        <strong>{{ key.capitalize() }}:</strong> {{ value }}<br>
+                    {% else %}
+                        <p>No metadata available.</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Speaker Metadata Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Speaker Metadata</h2>
+            </div>
+            <div class="card-body">
+                {% if speaker_metadata %}
+                    <strong>Number of Speakers:</strong> {{ speaker_metadata.num_speakers }}<br>
+                    {% for speaker, words in speaker_metadata.speaker_words.items() %}
+                        <strong>{{ speaker }}:</strong> 
+                        {% if words is iterable and words %}
+                            {{ ' '.join(words) }}<br>
+                        {% else %}
+                            <em>No words available for this speaker.</em><br>
+                        {% endif %}
+                    {% else %}
+                        <p>No speaker metadata available.</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Topic Modeling Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Extracted Topics</h2>
+            </div>
+            <div class="card-body">
+                {% for topic in topics %}
+                    <strong>Topic:</strong> {{ topic }}<br>
+                {% endfor %}
+                <div class="visualization-container">
+                    <h3>Topics Distribution</h3>
+                    <img src="data:image/png;base64,{{ topic_plot_url }}" alt="Topics Distribution" class="img-fluid">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sentiment Analysis Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Sentiment Analysis</h2>
+            </div>
+            <div class="card-body">
+                {% for speaker, (category, score) in sentiment_results.items() %}
+                    <strong>{{ speaker }}:</strong> Sentiment = {{ category }}, Score = {{ score }}<br>
+                {% endfor %}
+                <div class="visualization-container">
+                    <h3>Sentiment Distribution</h3>
+                    <img src="data:image/png;base64,{{ sentiment_plot_url }}" alt="Sentiment Distribution" class="img-fluid">
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Insights</h2>
+            </div>
+            <div class="card-body">
+                {% for insight in insights %}
+                    - {{ insight }}<br>
+                {% endfor %}
+                <div class="visualization-container">
+                    <h3>Words Per Speaker</h3>
+                    <img src="data:image/png;base64,{{ speaker_metadata_plot_url }}" alt="Words Per Speaker" class="img-fluid">
+                </div>
+            </div>
+        </div>
+
+        <!-- LLM Query Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Ask a Question</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/query">
+                    <div class="form-group">
+                        <label for="query_text">Enter your query:</label>
+                        <input type="text" class="form-control" id="query_text" name="query_text" placeholder="What does the transcription tell about?" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ask</button>
+                </form>
+                {% if llm_insight %}
+                    <hr>
+                    <h4>LLM Response:</h4>
+                    <p>{{ llm_insight }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

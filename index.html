@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription App</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap">
+    <!-- Custom CSS for Animations -->
+    <style>
+        /* Background Animation */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            color: #fff;
+        }
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* Title Animation */
+        .assignment-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 36px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInTitle 2s ease-in-out;
+        }
+        @keyframes fadeInTitle {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .file-preview {
+            margin-top: 20px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #transcriptionResults {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Assignment Title with Animation -->
+        <h1 class="assignment-title">C5i Assignment by KOUSHIC R</h1>
+        
+        <h1 class="text-center">Audio/Video Transcription</h1>
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <div class="form-group">
+                <label for="file">Upload an audio or video file:</label>
+                <input type="file" name="file" class="form-control" accept="audio/*,video/*" required onchange="previewFile()">
+            </div>
+
+            <!-- File Preview -->
+            <div class="file-preview" id="filePreview">
+                <video id="videoPreview" controls style="display: none; max-width: 100%;"></video>
+                <audio id="audioPreview" controls style="display: none; max-width: 100%;"></audio>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Transcribe</button>
+        </form>
+
+        <!-- Loading Spinner -->
+        <div id="loading">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p>Processing your file, please wait...</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- JavaScript for file preview -->
+    <script>
+        function previewFile() {
+            const fileInput = document.querySelector('input[name="file"]');
+            const file = fileInput.files[0];
+            const audioPreview = document.getElementById('audioPreview');
+            const videoPreview = document.getElementById('videoPreview');
+
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                if (file.type.startsWith('video')) {
+                    videoPreview.src = fileURL;
+                    videoPreview.style.display = 'block';
+                    audioPreview.style.display = 'none';
+                } else if (file.type.startsWith('audio')) {
+                    audioPreview.src = fileURL;
+                    audioPreview.style.display = 'block';
+                    videoPreview.style.display = 'none';
+                }
+            }
+        }
+
+        document.getElementById('uploadForm').onsubmit = function() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('transcriptionResults').style.display = 'none';
+        };
+    </script>
+</body>
+</html>
